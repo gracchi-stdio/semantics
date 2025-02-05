@@ -1,0 +1,12 @@
+.env
+.vscode/
+.idea/
+.obsidian/
+.venv/
+
+
+# don't git sql
+*.sqlite3
+/logging.log
+
+.entries/

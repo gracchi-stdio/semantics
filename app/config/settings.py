@@ -1,0 +1,46 @@
+from functools import lru_cache
+
+from pydantic import Field
+from enum import Enum
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class ZoteroLibraryType(str, Enum):
+    user = "user"
+    group = "group"
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    # Vector Store config
+    vector_store_type: str = "chroma"
+    chroma_collection: str = "readings"
+    chroma_persist_dir: str = "./chroma_db"
+
+    qwen_api_key: str
+    qwen_api_endpoint: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+    qwen_embedding_model: str = "text-embedding-v3"
+
+    deepseek_api_key: str
+
+    # Zotero integration
+    zotero_api_key: str
+    zotero_library_id: str
+    zotero_library_type: ZoteroLibraryType = ZoteroLibraryType.user
+
+    # Embedding Services
+    embedding_adaptor: str = "qwen"
+    embedding_batch_size: int = 32
+    embedding_max_retries: int = 3
+    embedding_timeout: int = 60
+
+    # Processing Parameters
+    chunk_size: int = 2000
+    chunk_overlap: int = 200
+
+@lru_cache(maxsize=None)
+def get_settings() -> Settings:
+    """Singleton configuration loader using LRU cache."""
+    return Settings()
+
+settings = get_settings()
