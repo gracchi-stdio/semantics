@@ -1,5 +1,8 @@
+from logging import exception
 from typing import Optional
 
+from app.config import settings
+from app.core.logger import logger
 from app.core.entities import DocumentMetadata
 from app.core.interfaces import IVectorStoreRepository, IEmbeddedGenerator
 from app.repos.vector_store.factory import VectorStoreFactory
@@ -7,7 +10,12 @@ from app.services.markdown.processor import MarkdownProcessor
 
 
 class SemanticService:
-    def __init__(self, vector_store: IVectorStoreRepository,  embedder: IEmbeddedGenerator, markdown_parser: MarkdownProcessor):
+    def __init__(
+        self,
+        vector_store: IVectorStoreRepository,
+        embedder: IEmbeddedGenerator,
+        markdown_parser: MarkdownProcessor,
+    ):
         self.vector_store = vector_store or VectorStoreFactory.create_store()
         self.embedder = embedder
         self.markdown_parser = markdown_parser or MarkdownProcessor()
@@ -20,8 +28,15 @@ class SemanticService:
         for chunk in chunks:
             chunk.embedding = self.embedder.generate(chunk.content)
             self.vector_store.upsert_chunk(chunk)
+
+        try:
+            self.vector_store.upsert_chunks(chunks)
+        except Exception as e:
+            logger.error(f"Failed to upsert chunks: {e}")
+            raise
         return len(chunks)
 
     def query(self, text: str, source_filter: str = None) -> list:
         """Query documents with optional source filter"""
         pass
+

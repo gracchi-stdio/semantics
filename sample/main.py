@@ -10,17 +10,23 @@ from langchain.text_splitter import MarkdownHeaderTextSplitter
 
 load_dotenv()
 
-qwen_api_key=os.getenv("QWEN_API_KEY")
+qwen_api_key = os.getenv("QWEN_API_KEY")
 
-client = OpenAI(api_key=qwen_api_key, base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
+client = OpenAI(
+    api_key=qwen_api_key,
+    base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+)
+
 
 def read_markdown(file_path: str) -> str:
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
+
 def generate_content_id(text, metadata):
     unique_string = text + str(metadata)
     return hashlib.sha256(unique_string.encode("utf-8")).hexdigest()[:32]
+
 
 markdown_content = read_markdown("../entries/abrahamianHistoryModernIran2018/source.md")
 
@@ -48,6 +54,7 @@ final_chunks = chunks_splitter.split_documents(md_header_splits)
 chroma_client = chromadb.PersistentClient(path="../chroma_db")
 collections = chroma_client.get_or_create_collection(name="book_embeddings")
 
+
 # Step 6: Generate and store embeddings
 def get_embedding(text: str):
     response = client.embeddings.create(input=text, model="text-embedding-v3")
@@ -62,7 +69,9 @@ for i, chunk in enumerate(final_chunks):
     text_content = chunk.page_content
     metadata = chunk.metadata
 
-    if not isinstance(metadata, dict) or not metadata:  # Check if metadata is a non-empty dict
+    if (
+        not isinstance(metadata, dict) or not metadata
+    ):  # Check if metadata is a non-empty dict
         metadata = {"default_key": "default_value"}  # Assign a default dictionary
 
     print(f"iteration: {i} / {ln}")
@@ -76,13 +85,16 @@ for i, chunk in enumerate(final_chunks):
         metadatas=metadata,
     )
 
+
 # step 7: Query function
 def query_book(query_text: str, top_k=3):
     query_embedding = get_embedding(query_text)
     results = collections.query(query_embeddings=query_embedding, n_results=top_k)
     return results
 
+
 query_res = query_book("What are the main themes of the book?")
 for doc in query_res["documents"][0]:
     print(doc)
     print("\n---\n")
+
