@@ -12,7 +12,7 @@ class QwenEmbeddingGenerator(IEmbeddedGenerator):
             base_url=settings.qwen_api_endpoint, api_key=settings.qwen_api_key
         )
         self.model = settings.qwen_embedding_model
-        self._dimension = getattr(settings, "qwen_embedding_dimension", 1536)
+        self._dimension = getattr(settings, "qwen_embedding_dimension", 1024)
 
     @retry(tries=3, delay=2, backoff=2, exceptions=(APIConnectionError, APIError))
     def generate(self, text: str) -> List[float]:
@@ -55,4 +55,3 @@ class QwenEmbeddingGenerator(IEmbeddedGenerator):
     def get_dimensions(self) -> int:
         """Get the expected embedding dimension."""
         return self._dimension
-

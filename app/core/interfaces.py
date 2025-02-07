@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Any, Dict, List, Optional
 
-from anyio.abc import Listener
-
-from app.core.entities import DocumentChunk
+from chromadb.api.types import Document
+from app.core.entities import DocumentChunk, DocumentMetadata
 
 
 class IVectorStoreRepository(ABC):
@@ -12,18 +11,30 @@ class IVectorStoreRepository(ABC):
         pass
 
     @abstractmethod
-    def search(self, embedding: List[float], top_k: int, filters: dict) -> List[DocumentChunk]:
+    def upsert_chunks(self, chunks: List[DocumentChunk]) -> None:
         pass
+
+    @abstractmethod
+    def search(
+        self,
+        embedding: List[float],
+        top_k: int = 5,
+        filters: Optional[Dict[str, Any]] = None,
+    ) -> List[DocumentChunk]:
+        pass
+
 
 class IMetadataRepository(ABC):
     @abstractmethod
-    def get_metadata(self, source_id: str) -> dict:
+    def get_metadata(self, source_id: str) -> Optional[DocumentMetadata]:
         pass
+
 
 class IDocumentRepository(ABC):
     @abstractmethod
-    def process(self, content: str, metadata: str) -> List[DocumentChunk]:
+    def process(self, content: str, metadata: DocumentMetadata) -> List[DocumentChunk]:
         pass
+
 
 class IEmbeddedGenerator(ABC):
     @abstractmethod

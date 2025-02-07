@@ -9,4 +9,8 @@
 *.sqlite3
 /logging.log
 
+**__pycache__/
+
 .entries/
+
+chroma_db/
