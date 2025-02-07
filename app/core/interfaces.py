@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from chromadb.api.types import Document
-from app.core.entities import DocumentChunk, DocumentMetadata
+from app.core.documents import DocumentChunk, DocumentMetadata
 
 
 class IVectorStoreRepository(ABC):
@@ -26,7 +26,17 @@ class IVectorStoreRepository(ABC):
 
 class IMetadataRepository(ABC):
     @abstractmethod
-    def get_metadata(self, source_id: str) -> Optional[DocumentMetadata]:
+    def get_metadata(self, source_id: str) -> DocumentMetadata | None:
+        pass
+
+
+class ILibraryManagerRepository(ABC):
+    @abstractmethod
+    def get_metadata(self, source_id: str) -> DocumentMetadata | None:
+        pass
+
+    @abstractmethod
+    def get_source_content(self, parent_id: str) -> str | None:
         pass
 
 

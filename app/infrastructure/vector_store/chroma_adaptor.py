@@ -1,13 +1,13 @@
 from typing import Any, Dict, List, Optional
-from chromadb.config import Settings
 from datetime import datetime
 
 from pydantic import validate_call
 
 
 from app.config.settings import settings
+from app.core.exceptions import VectorStoreError
 from app.core.logger import logger
-from app.core.entities import DocumentChunk, DocumentMetadata
+from app.core.documents import DocumentChunk, DocumentMetadata
 from app.core.interfaces import IVectorStoreRepository
 import chromadb
 
@@ -21,16 +21,17 @@ class ChromaAdaptor(IVectorStoreRepository):
         persist_dir: Directory to persist data (default from settings)
         """
 
-        if not collection_name:
-            raise ValueError("Collection name cannot be emnpty.")
-
         self.client = chromadb.PersistentClient(
-            path="/home/tg/Development/semantics/chroma_db",  # TODO change to settings
+            path=persist_dir or settings.chroma_persist_dir,  # TODO change to settings
         )
 
-        self.collection = self.client.get_or_create_collection(
-            name=collection_name, metadata={"hnsw:space": "cosine"}
-        )
+        try:
+            self.collection = self.client.get_or_create_collection(
+                name=collection_name, metadata={"hnsw:space": "cosine"}
+            )
+        except Exception as e:
+            logger.error(f"Failed to Initialize Chroma collection: {e}")
+            raise VectorStoreError(f"Failed to Initialize Chroma: {e}")
 
         logger.info(f"Initialized Chroma collection '{collection_name}'")
 
@@ -72,13 +73,7 @@ class ChromaAdaptor(IVectorStoreRepository):
                 raise ValueError("Chunk must have content and content_hash")
 
             meta = {
-                key: (
-                    value.isoformat()
-                    if isinstance(value, datetime)
-                    else ""
-                    if value is None
-                    else value
-                )
+                key: (value.isoformat() if isinstance(value, datetime) else str(value))
                 for key, value in chunk.metadata.__dict__.items()
             }
 
@@ -98,7 +93,7 @@ class ChromaAdaptor(IVectorStoreRepository):
 
         except Exception as e:
             logger.error(f"Failed to upsert batch of {batch_size} chunks: {e}")
-            raise
+            raise VectorStoreError(f"Upsert failed: {e}")
 
     @validate_call
     def search(
@@ -188,4 +183,4 @@ class ChromaAdaptor(IVectorStoreRepository):
             return document_chunks
         except Exception as e:
             logger.error(f"Search failed: {e}")
-            raise
+            raise VectorStoreError(f"Search failed: {e}")

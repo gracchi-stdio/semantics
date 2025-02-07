@@ -1,5 +1,5 @@
 from typing import List
-from app.core.entities import DocumentChunk
+from app.core.documents import DocumentChunk
 from app.core.interfaces import IDocumentRepository, IEmbeddedGenerator
 from app.services.markdown.processor import MarkdownProcessor
 from app.core.logger import logger

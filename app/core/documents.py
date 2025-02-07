@@ -9,7 +9,7 @@ from pydantic import (
     ConfigDict,
     PrivateAttr,
 )
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 
 @dataclass(frozen=True)
@@ -71,7 +71,8 @@ class DocumentChunk(BaseModel):
         return v
 
 
-class ProcessedDocument(BaseModel):
+@dataclass
+class ProcessedDocument:
     source_id: str = Field(..., pattern=r"[A-Za-z0-9_-]+")
     chunks: List[DocumentChunk] = Field(..., min_length=1)
     processed_at: datetime = Field(default_factory=datetime.now)
@@ -84,13 +85,29 @@ class ProcessedDocument(BaseModel):
         return v
 
 
-def convert_zotero_item(item: dict) -> DocumentMetadata:
-    """Convert Zotero API response to our metadata format"""
-    return DocumentMetadata(
-        zotero_id=item["key"],
-        title=item["data"]["title"],
-        authors="; ".join(item["data"]["authors"]),
-        tags=item["data"].get("tags", ""),
-        source_version=item.get("version", "v1.0.0"),
-        language=item["data"].get("language", "en"),
-    )
+class ZoteroItemData(BaseModel):
+    key: str
+    version: int
+    parentItem: Optional[str] = None
+    itemType: Optional[str] = None
+    linkMode: Optional[str] = None
+    title: Optional[str] = None
+    accessDate: Optional[str] = None
+    url: Optional[str] = None
+    note: Optional[str] = None
+    contentType: Optional[str] = None
+    charset: Optional[str] = None
+    filename: Optional[str] = None
+    tags: Optional[List[Dict]] = None
+    relations: Optional[Dict] = None
+    dateAdded: Optional[str] = None
+    dateModified: Optional[str] = None
+
+
+class ZoteroItem(BaseModel):
+    key: str
+    version: int
+    parentCollection: Union[bool, str, None] = None
+    links: Dict
+    meta: Dict
+    data: ZoteroItemData

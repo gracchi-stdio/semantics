@@ -6,6 +6,7 @@ from app.repos.embedding.qwen_embedder import QwenEmbeddingGenerator
 class EmbeddingFactory:
     @staticmethod
     def create_embedder() -> IEmbeddedGenerator:
-        if settings.embedding_adaptor == "qwen":
+        embedding_adaptor = settings.embedding_adaptor
+        if embedding_adaptor == "qwen":
             return QwenEmbeddingGenerator()
-        raise ValueError(f"Invalid embedding model: {settings.embedding_model}")
+        raise ValueError(f"Invalid embedding model: {embedding_adaptor}")

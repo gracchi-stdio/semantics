@@ -2,6 +2,7 @@ from typing import List
 from openai import OpenAI, APIConnectionError, APIError
 from retry import retry
 from app.config.settings import settings
+from app.core.exceptions import EmbeddingGenerationError
 from app.core.interfaces import IEmbeddedGenerator
 from app.core.logger import logger
 
@@ -35,13 +36,16 @@ class QwenEmbeddingGenerator(IEmbeddedGenerator):
             response = self.client.embeddings.create(input=text, model=self.model)
 
             if not response.data or not response.data[0].embedding:
-                raise ValueError("Invalid embedding response")
+                raise EmbeddingGenerationError("Invalid embedding response")
 
             embedding = response.data[0].embedding
 
             if len(embedding) != self._dimension:
                 logger.warning(
                     f"Embedding dimension mismatch. Expected {self._dimension}, got {len(embedding)}"
+                )
+                raise EmbeddingGenerationError(
+                    f"Embedding dimenstion mismatch. Expected {self._dimension}, got {len(embedding)}"
                 )
 
             return embedding

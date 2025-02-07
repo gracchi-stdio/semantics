@@ -2,33 +2,60 @@
   "name": "CodeCompanion.nvim",
   "version": "1.0.0",
   "workspace_spec": "1.0",
+  "vars": {
+    "base_dir": ""
+  },
   "description": "This is an app that creates a database of embedding for the zotero enteries from md files",
   "system_prompt": "Write efficient code. Use design patterns and avoid unnecessary complexity.",
   "groups": [
     {
-      "name": "Chat Buffer",
-      "system_prompt": "...",
-      "opts": {
-        "remove_config_system_prompt": true
-      },
+      "name": "Application",
+      "system_prompt": "Focus on domain models, interfaces, and core business logic",
       "files": [
         {
-          "description": "interfaces",
-          "path": "${base_dir}/app/core/interfaces.py"
+          "description": "Application configuration settings",
+          "path": "app/config/settings.py"
         },
         {
-          "description": "entities",
-          "path": "${base_dir}/app/core/entities.py"
+          "description": "Domain entities and data models for documents",
+          "path": "app/core/documents.py"
         },
         {
-          "description": "semantic app service",
-          "path": "${base_dir}/app/services/semantic_service.py"
-        }
-      ],
-      "symbols": [
+          "description": "Entities to be used for zotero service",
+          "path": "app/core/zotero.py"
+        },
+
         {
-          "description": "...",
-          "path": "..."
+          "description": "Application interfaces and abstract contracts",
+          "path": "app/core/interfaces.py"
+        },
+        {
+          "description": "Custom exception hierarchy",
+          "path": "app/core/exceptions.py"
+        },
+        {
+          "description": "Logging configuration and utilities",
+          "path": "app/core/logger.py"
+        },
+        {
+          "description": "Zotero metadata repository implementation",
+          "path": "app/infrastructure/zotero/metadata_repository.py"
+        },
+        {
+          "description": "Vector store factory and adaptors",
+          "path": "app/infrastructure/vector_store/factory.py"
+        },
+        {
+          "description": "Markdown document processing logic",
+          "path": "app/infrastructure/markdown/processor.py"
+        },
+        {
+          "description": "Semantic processing service entry point",
+          "path": "app/services/semantic_service.py"
+        },
+        {
+          "description": "Main application entry point",
+          "path": "main.py"
         }
       ]
     }

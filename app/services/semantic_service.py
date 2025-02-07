@@ -1,7 +1,7 @@
-import re
 from typing import Optional
 
-from app.core.entities import ProcessedDocument
+from app.core.documents import ProcessedDocument
+from app.core.exceptions import DocumentProcessingError
 from app.core.interfaces import (
     IDocumentRepository,
     IEmbeddedGenerator,
@@ -77,24 +77,4 @@ class SemanticService:
 
         except Exception as e:
             logger.error(f"Processing failed for {source_id}: {e}")
-            raise
-
-    # def ingest_document(self, content: str, metadata: DocumentMetadata) -> int:
-    #     """Return number of chunks processed"""
-    #     md_metadata = metadata
-    #
-    #     chunks = self.processor.process(content, md_metadata)
-    #     for chunk in chunks:
-    #         chunk.embedding = self.embedder.generate(chunk.content)
-    #         self.vector_store.upsert_chunk(chunk)
-    #
-    #     try:
-    #         self.vector_store.upsert_chunks(chunks)
-    #     except Exception as e:
-    #         logger.error(f"Failed to upsert chunks: {e}")
-    #         raise
-    #     return len(chunks)
-    #
-    # def query(self, text: str, source_filter: str = None) -> list:
-    #     """Query documents with optional source filter"""
-    #     pass
+            raise DocumentProcessingError(f"Document processing failed: {e}")

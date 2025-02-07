@@ -2,7 +2,7 @@ from operator import itemgetter
 from typing import Dict, Optional
 from app.config.settings import settings
 from app.core.logger import logger
-from app.core.entities import DocumentMetadata, convert_zotero_item
+from app.core.documents import DocumentMetadata, convert_zotero_item
 from app.core.interfaces import IMetadataRepository
 from pyzotero import zotero
 

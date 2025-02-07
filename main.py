@@ -1,13 +1,10 @@
 from app.core.interfaces import IMetadataRepository
 from app.core.logger import logger
 from app.config.settings import settings
-from app.core.entities import DocumentMetadata
-from app.repos.embedding.factory import EmbeddingFactory
-from app.repos.embedding.qwen_embedder import QwenEmbeddingGenerator
-from app.repos.markdown.document_repository import MarkdownDocumentRepo
-from app.repos.vector_store.chroma_adaptor import ChromaAdaptor
+from app.core.documents import DocumentMetadata
+from app.infrastructure.zotero.zotero_repository import ZoteroRepository
 from app.services.semantic_service import SemanticService
-from app.services.markdown.processor import MarkdownProcessor
+from app.services.zotero_service import ZoteroService
 
 
 class MockMetadataRepository(IMetadataRepository):
@@ -22,42 +19,50 @@ class MockMetadataRepository(IMetadataRepository):
         )
 
 
-def main():
-    # Initialize dependencies
-    vector_store = ChromaAdaptor(collection_name="documents")
-    embedder = QwenEmbeddingGenerator()
-    processor = MarkdownDocumentRepo(embedder=embedder)
-    metadata_repo = MockMetadataRepository()
+def zotero_test():
+    zRepo = ZoteroRepository()
 
-    semantic_service = SemanticService(
-        vector_store=vector_store,
-        embedder=embedder,
-        processor=processor,
-        metadata_repo=metadata_repo,
-    )
+    content = zRepo.get_source_content("GIMF3MWC")
 
-    md_content = """
-    # Research Paper Summary
-    
-    ## Introduction
-    Large language models (LLMs) have revolutionized natural language processing...
-    
-    ## Methodology
-    We conducted experiments using transformer-based architectures...
-    """
+    print(content)
 
-    processed_doc = semantic_service.process_document("paper_123", md_content)
 
-    if processed_doc:
-        logger.info(f"Processed document with {len(processed_doc.chunks)} chunks")
-
-        # example search
-        test_embedding = embedder.generate("transformer experiments")
-        results = vector_store.search(test_embedding, top_k=1)
-        logger.info(f"Search result: {results}")
-    else:
-        logger.error("Document processing failed")
-
+# def main():
+#     # Initialize dependencies
+#     vector_store = ChromaAdaptor(collection_name="documents")
+#     embedder = QwenEmbeddingGenerator()
+#     processor = MarkdownDocumentRepo(embedder=embedder)
+#     metadata_repo = MockMetadataRepository()
+#
+#     semantic_service = SemanticService(
+#         vector_store=vector_store,
+#         embedder=embedder,
+#         processor=processor,
+#         metadata_repo=metadata_repo,
+#     )
+#
+#     md_content = """
+#     # Research Paper Summary
+#
+#     ## Introduction
+#     Large language models (LLMs) have revolutionized natural language processing...
+#
+#     ## Methodology
+#     We conducted experiments using transformer-based architectures...
+#     """
+#
+#     processed_doc = semantic_service.process_document("paper_123", md_content)
+#
+#     if processed_doc:
+#         logger.info(f"Processed document with {len(processed_doc.chunks)} chunks")
+#
+#         # example search
+#         test_embedding = embedder.generate("transformer experiments")
+#         results = vector_store.search(test_embedding, top_k=1)
+#         logger.info(f"Search result: {results}")
+#     else:
+#         logger.error("Document processing failed")
+#
 
 if __name__ == "__main__":
-    main()
+    zotero_test()

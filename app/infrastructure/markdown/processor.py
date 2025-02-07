@@ -10,7 +10,7 @@ from langchain_text_splitters import (
 )
 
 from app.config.settings import settings
-from app.core.entities import DocumentMetadata, DocumentChunk
+from app.core.documents import DocumentMetadata, DocumentChunk
 from app.core.logger import logger
 
 

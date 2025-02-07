@@ -1,8 +1,11 @@
 from functools import lru_cache
+from typing import Literal
 
-from pydantic import Field
 from enum import Enum
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+VectorStoreTypes = Literal["chroma", "pinecone", "qdrant"]
 
 
 class ZoteroLibraryType(str, Enum):
@@ -14,7 +17,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     # Vector Store config
-    vector_store_type: str = "chroma"
+    vector_store_type: VectorStoreTypes = "chroma"
     chroma_collection: str = "readings"
     chroma_persist_dir: str = "/home/tg/Development/semantics/chroma_db"
 
@@ -50,4 +53,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
