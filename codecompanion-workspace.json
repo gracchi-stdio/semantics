@@ -39,7 +39,7 @@
         },
         {
           "description": "Zotero metadata repository implementation",
-          "path": "app/infrastructure/zotero/metadata_repository.py"
+          "path": "app/infrastructure/zotero/zotero_service.py"
         },
         {
           "description": "Vector store factory and adaptors",

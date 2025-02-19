@@ -3,7 +3,7 @@ from typing import Literal, Optional
 from app.config.settings import VectorStoreTypes, settings
 from app.core.exceptions import VectorStoreError
 from app.core.interfaces import IVectorStoreRepository
-from app.repos.vector_store.chroma_adaptor import ChromaAdaptor
+from app.infrastructure.vector_store.chroma_adaptor import ChromaAdaptor
 
 
 class VectorStoreFactory:

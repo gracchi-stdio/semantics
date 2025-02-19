@@ -13,7 +13,7 @@ class ZoteroLiberary(BaseModel):
 
 class ZoteroTag(BaseModel):
     tag: str = Field(description="Tag name.")
-    type: Optional[int] = Field(description="Tag type.")
+    type: Optional[int] = Field(default=0, description="Tag type.")
 
 
 class ZoteroCreator(BaseModel):

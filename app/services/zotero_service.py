@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from pyzotero.zotero import Zotero
 from app.config.settings import settings
 from app.core.logger import logger
-from app.core.documents import DocumentMetadata, ZoteroItem
+from app.core.zotero import DocumentMetadata, ZoteroItem
 
 
 class ZoteroService:

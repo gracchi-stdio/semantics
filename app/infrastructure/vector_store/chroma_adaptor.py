@@ -20,9 +20,11 @@ class ChromaAdaptor(IVectorStoreRepository):
         collection_name: Name of the collection to use
         persist_dir: Directory to persist data (default from settings)
         """
-
+        print(settings.chroma_persist_dir)
         self.client = chromadb.PersistentClient(
-            path=persist_dir or settings.chroma_persist_dir,  # TODO change to settings
+            path=persist_dir
+            if persist_dir
+            else settings.chroma_persist_dir,  # TODO change to settings
         )
 
         try:
@@ -66,7 +68,14 @@ class ChromaAdaptor(IVectorStoreRepository):
         documents = []
         metadatas = []
 
-        logger.debug(f"Preparing to upsert {batch_size} chunks")
+        unique_chunks = list({chunk.content_hash: chunk for chunk in chunks}.values())
+
+        if len(unique_chunks) != len(chunks):
+            logger.warning(
+                f"Original number of chunks: {len(chunks)}, number of unique chunks: {len(unique_chunks)} "
+            )
+        else:
+            logger.debug(f"Preparing to upsert {batch_size} chunks")
 
         for chunk in chunks:
             if not chunk.content_hash or not chunk.content:

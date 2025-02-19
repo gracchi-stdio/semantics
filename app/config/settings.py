@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     chunk_size: int = 1000
     chunk_overlap: int = 100
 
+    database_url: str = "sqlite:///./data/app."
+
 
 @lru_cache(maxsize=None)
 def get_settings() -> Settings:

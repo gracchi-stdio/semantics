@@ -5,10 +5,11 @@ from app.core.exceptions import DocumentProcessingError
 from app.core.interfaces import (
     IDocumentRepository,
     IEmbeddedGenerator,
-    IMetadataRepository,
+    ILibraryManagerRepository,
     IVectorStoreRepository,
 )
 from app.core.logger import logger
+from tqdm import tqdm
 
 
 class SemanticService:
@@ -17,12 +18,25 @@ class SemanticService:
         vector_store: IVectorStoreRepository,
         embedder: IEmbeddedGenerator,
         processor: IDocumentRepository,
-        metadata_repo: IMetadataRepository,
+        library_manager: ILibraryManagerRepository,
     ):
         self.vector_store = vector_store
         self.embedder = embedder
         self.processor = processor
-        self.metadata_repo = metadata_repo
+        self.library_manager = library_manager
+
+    def process_zotero_item(self, zotero_id: str) -> ProcessedDocument | None:
+        try:
+            content = self.library_manager.get_source_content(zotero_id)
+            if content is None:
+                return None
+        except Exception as e:
+            logger.error(
+                f"Something happened during retriving the content from zotero: {e}"
+            )
+            raise
+
+        return self.process_document(zotero_id, content)
 
     def process_document(self, source_id, content: str) -> Optional[ProcessedDocument]:
         if not content.strip():
@@ -31,7 +45,7 @@ class SemanticService:
 
         try:
             # 1. Fetch metadata
-            metadata = self.metadata_repo.get_metadata(source_id)
+            metadata = self.library_manager.get_metadata(source_id)
             if not metadata:
                 logger.error(f"Metadata not found for {source_id}")
                 return None
@@ -44,7 +58,7 @@ class SemanticService:
 
             # 3. Generate embedding
             processed_chunks = []
-            for chunk in raw_chunks:
+            for chunk in tqdm(raw_chunks, desc="Processing embedding"):
                 try:
                     embedding = self.embedder.generate(chunk.content)
                     if (

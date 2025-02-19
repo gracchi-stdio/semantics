@@ -9,7 +9,7 @@ from pydantic import (
     ConfigDict,
     PrivateAttr,
 )
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 
 
 @dataclass(frozen=True)
@@ -83,31 +83,3 @@ class ProcessedDocument:
         if any(chunk.source_id != source_id for chunk in v):
             raise ValueError("Chunk source ID mismatch")
         return v
-
-
-class ZoteroItemData(BaseModel):
-    key: str
-    version: int
-    parentItem: Optional[str] = None
-    itemType: Optional[str] = None
-    linkMode: Optional[str] = None
-    title: Optional[str] = None
-    accessDate: Optional[str] = None
-    url: Optional[str] = None
-    note: Optional[str] = None
-    contentType: Optional[str] = None
-    charset: Optional[str] = None
-    filename: Optional[str] = None
-    tags: Optional[List[Dict]] = None
-    relations: Optional[Dict] = None
-    dateAdded: Optional[str] = None
-    dateModified: Optional[str] = None
-
-
-class ZoteroItem(BaseModel):
-    key: str
-    version: int
-    parentCollection: Union[bool, str, None] = None
-    links: Dict
-    meta: Dict
-    data: ZoteroItemData

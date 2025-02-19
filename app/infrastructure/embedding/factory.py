@@ -1,6 +1,6 @@
 from app.config.settings import settings
 from app.core.interfaces import IEmbeddedGenerator
-from app.repos.embedding.qwen_embedder import QwenEmbeddingGenerator
+from app.infrastructure.embedding.qwen_embedder import QwenEmbeddingGenerator
 
 
 class EmbeddingFactory:

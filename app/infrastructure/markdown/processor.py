@@ -1,13 +1,12 @@
 from dataclasses import asdict
-from datetime import datetime
 from typing import List
 
-from chromadb.api.types import Embeddings
 from langchain_core.documents import Document
 from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
+from tqdm import tqdm
 
 from app.config.settings import settings
 from app.core.documents import DocumentMetadata, DocumentChunk
@@ -60,9 +59,10 @@ class MarkdownProcessor:
         logger.info(f"Processing content length: {len(content)} characters")
         logger.debug(f"Content sample: {content[:200]}...")
 
+        print(content)
         # Test
-        test_split = self.header_splitter.split_text("# Test\nContent")
-        logger.info(f"Test header split result: {len(test_split)} chunks")
+        # test_split = self.header_splitter.split_text("# Test\nContent")
+        # logger.info(f"Test header split result: {len(test_split)} chunks")
 
         # First split by headers
         try:
@@ -80,7 +80,7 @@ class MarkdownProcessor:
             header_splits = [Document(page_content=content, metadata={})]
 
         final_chunks = []
-        for split in header_splits:
+        for split in tqdm(header_splits, desc="Splitting content"):
             if not split.page_content.strip():
                 logger.debug("Skipping empty split")
                 continue
@@ -97,7 +97,7 @@ class MarkdownProcessor:
             if not split.page_content.strip():
                 continue
 
-            text_splits = self.text_splitter.split_documents([split])
+            # text_splits = self.text_splitter.split_documents([split])
 
             # Ensure at least one chink per split
             if not text_splits:

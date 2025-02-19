@@ -4,6 +4,7 @@
 .obsidian/
 .venv/
 
+sample/
 
 # don't git sql
 *.sqlite3

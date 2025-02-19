@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from chromadb.api.types import Document
 from app.core.documents import DocumentChunk, DocumentMetadata
 
 
